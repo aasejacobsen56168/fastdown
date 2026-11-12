@@ -179,7 +179,7 @@ fast-download billing portal
 把 MCP 接进本机所有支持的 Agent：
 
 ```bash
-fast-download setup agent --auto          # 写入 Codex / Claude Code / Cursor / VS Code / OpenCode / Gemini CLI / Windsurf
+fast-download setup agent --auto          # 写入所有检测到的 Agent
 fast-download setup agent --print         # 只打印 JSON 配置，不动文件
 ```
 
