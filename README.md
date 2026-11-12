@@ -344,7 +344,7 @@ cd examples/go && go run . -o ../../downloads "https://v.douyin.com/xxxx/"
 
 | 项 | 值 |
 |---|---|
-| 用法仓库版本 | v0.6.0（与服务端发版同步刷新） |
+| 用法仓库版本 | v0.6.1（与服务端发版同步刷新） |
 | 官网 / 网页版 | <https://fastdown.pro> |
 | API Base | <https://fastdown.pro/api> |
 | 健康检查 | <https://fastdown.pro/api/v1/health> |

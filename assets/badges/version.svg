@@ -3,5 +3,5 @@
   <rect x="62" width="54" height="22" rx="4" fill="#087f5b"/>
   <rect x="62" width="6" height="22" fill="#087f5b"/>
   <text x="31" y="15" text-anchor="middle" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#ffffff">version</text>
-  <text x="89" y="15" text-anchor="middle" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#ffffff">v0.6.0</text>
+  <text x="89" y="15" text-anchor="middle" font-family="Verdana, 'DejaVu Sans', sans-serif" font-size="10.5" font-weight="700" fill="#ffffff">v0.6.1</text>
 </svg>
