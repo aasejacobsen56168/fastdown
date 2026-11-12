@@ -1,0 +1,13 @@
+{
+  "name": "fastdown-examples-node",
+  "private": true,
+  "type": "module",
+  "description": "Fastdown REST API examples for Node 18+ (zero dependencies)",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "parse": "node parse.mjs",
+    "download": "node download.mjs"
+  }
+}

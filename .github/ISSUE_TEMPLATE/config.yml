@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 直接使用 Fastdown
+    url: https://fastdown.pro/?utm_source=github&utm_medium=issue_template
+    about: 网页版免安装，粘贴链接即可解析
+  - name: 套餐与配额
+    url: https://fastdown.pro/pricing?utm_source=github&utm_medium=issue_template
+    about: 查看 Free / Pro / Max 的每日解析额度
+  - name: API Key 管理
+    url: https://fastdown.pro/integrations?utm_source=github&utm_medium=issue_template
+    about: 创建、轮换或吊销 API Key

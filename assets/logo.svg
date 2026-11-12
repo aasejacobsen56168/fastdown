@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 392 92" width="392" height="92" role="img" aria-label="Fastdown.pro">
+  <rect x="0.5" y="0.5" width="391" height="91" rx="18" fill="#fffaf0" stroke="#e6dbc6"/>
+  <rect x="14" y="14" width="64" height="64" rx="15" fill="#151711"/>
+  <text x="46" y="57" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#fffaf0">fd</text>
+  <text x="94" y="46" font-family="'Avenir Next', Avenir, 'Segoe UI', sans-serif" font-size="27" font-weight="700" fill="#151711">fastdown<tspan fill="#ff5a36">.pro</tspan></text>
+  <text x="95" y="68" font-family="'Avenir Next', Avenir, 'Segoe UI', sans-serif" font-size="12" letter-spacing="1.6" fill="#74796e">CLI · MCP · REST API</text>
+</svg>

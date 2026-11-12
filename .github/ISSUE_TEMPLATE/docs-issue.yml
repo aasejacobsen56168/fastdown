@@ -1,0 +1,55 @@
+name: 文档 / 示例问题
+description: 文档与线上行为不一致、示例跑不通、命令报错
+title: "[docs] "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。提交前请确认：**不要贴 API Key、会话 token、Cookie、邮箱或任何个人信息**。
+        接口问题请附上 `request_id`，方便我们按日志定位。
+  - type: input
+    id: where
+    attributes:
+      label: 出问题的位置
+      description: 文件路径或命令
+      placeholder: docs/api.md / examples/python/parse.py / fast-download download
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 你期望发生什么
+      placeholder: 按文档执行应该返回 media[].url
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际发生了什么
+      description: 贴报错输出时请删掉 token 与个人信息
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: request_id
+    attributes:
+      label: request_id（接口问题必填）
+      placeholder: req_53069806a84e473a8e83e5fea129f6e1
+  - type: input
+    id: when
+    attributes:
+      label: 发生时间（含时区）
+      placeholder: 2026-11-12 21:30 GMT+8
+  - type: dropdown
+    id: surface
+    attributes:
+      label: 使用的形态
+      options:
+        - 网页版
+        - CLI
+        - MCP / Agent
+        - REST API
+        - 文档本身
+    validations:
+      required: true

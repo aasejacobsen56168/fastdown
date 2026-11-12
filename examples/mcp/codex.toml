@@ -1,0 +1,5 @@
+# Codex — append to ~/.codex/config.toml
+# Use the absolute path printed by: fast-download setup agent --print
+[mcp_servers.fast-download]
+command = "/Users/you/.local/bin/fast-download"
+args = ["mcp", "--stdio"]

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "fast-download": {
+      "command": "/Users/you/.local/bin/fast-download",
+      "args": ["mcp", "--stdio"]
+    }
+  }
+}

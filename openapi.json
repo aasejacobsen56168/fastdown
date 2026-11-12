@@ -1,0 +1,1209 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Fastdown.pro API",
+    "version": "1.0.0",
+    "description": "Cloudflare Worker API for Google OAuth, quota, TK无水印下载 CLI Agent, TikTok无水印下载, CLI Agent 视频下载, 抖音无水印, TK/TikTok 无水印, YouTube/YouTube Shorts, Instagram Reels, Facebook, X/Twitter, 小红书无水印, public short-video parsing and Stripe billing."
+  },
+  "servers": [
+    {
+      "url": "https://fastdown.pro/api"
+    }
+  ],
+  "paths": {
+    "/v1/health": {
+      "get": {
+        "summary": "Check API health",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/google/url": {
+      "get": {
+        "summary": "Create a Google OAuth URL",
+        "operationId": "createGoogleAuthUrl",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "agent-desktop"
+          },
+          {
+            "name": "install_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "return_to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OAuth URL and state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleAuthUrlResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/auth/google/check": {
+      "post": {
+        "summary": "Poll or claim a Google OAuth state",
+        "operationId": "checkGoogleAuth",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "state"
+                ],
+                "properties": {
+                  "state": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session token and user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleCheckResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/auth/email/start": {
+      "post": {
+        "summary": "Email a 6-digit login verification code",
+        "operationId": "startEmailLogin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification code sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailStartResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/auth/email/verify": {
+      "post": {
+        "summary": "Exchange an email verification code for a session token",
+        "operationId": "verifyEmailLogin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "code"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session token and user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleCheckResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "summary": "Revoke the current session",
+        "operationId": "logout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "summary": "Return user, quota and subscription status",
+        "operationId": "getAccount",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authenticated account status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/quota": {
+      "get": {
+        "summary": "Return current daily parse quota",
+        "operationId": "getQuota",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quota status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotaResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/parse": {
+      "post": {
+        "summary": "Parse a public TK无水印下载/TikTok/YouTube/Instagram/小红书 short-video share link",
+        "operationId": "parseVideo",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Normalized parse result with quota",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParseResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "429": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/billing/checkout": {
+      "post": {
+        "summary": "Create a Stripe Checkout URL",
+        "operationId": "createCheckout",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "plan_id"
+                ],
+                "properties": {
+                  "plan_id": {
+                    "type": "string",
+                    "enum": [
+                      "pro",
+                      "max"
+                    ]
+                  },
+                  "success_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cancel_url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/billing/portal": {
+      "post": {
+        "summary": "Create a Stripe Billing Portal URL",
+        "operationId": "createBillingPortal",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Billing Portal URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/keys": {
+      "get": {
+        "summary": "List API keys for the signed-in account",
+        "description": "Requires a browser or CLI session. Secrets are never returned, only the display prefix.",
+        "operationId": "listApiKeys",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Key list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an API key",
+        "description": "Returns the full key once. Up to three active keys per account, and API keys cannot manage keys.",
+        "operationId": "createApiKey",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 40,
+                    "example": "CI"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Key created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/keys/{id}/revoke": {
+      "post": {
+        "summary": "Revoke an API key",
+        "description": "Stops the key immediately. Requires a session, not a key.",
+        "operationId": "revokeApiKey",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "key_9f2c41ab"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyRevokedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/v1/keys/{id}/rotate": {
+      "post": {
+        "summary": "Rotate an API key",
+        "description": "Revokes the old key and returns a new secret with the same name.",
+        "operationId": "rotateApiKey",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "key_9f2c41ab"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyCreatedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "API error envelope",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "EnvelopeBase": {
+        "type": "object",
+        "required": [
+          "ok",
+          "request_id"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "request_id": {
+            "type": "string"
+          }
+        }
+      },
+      "HealthResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "service",
+                  "ok",
+                  "time"
+                ],
+                "properties": {
+                  "service": {
+                    "type": "string",
+                    "example": "fast-download-api"
+                  },
+                  "ok": {
+                    "type": "boolean"
+                  },
+                  "time": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "GoogleAuthUrlResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "url",
+                  "state"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "state": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "GoogleCheckResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "session_token",
+                  "user"
+                ],
+                "properties": {
+                  "session_token": {
+                    "type": "string"
+                  },
+                  "user": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "EmailStartResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "expires_in",
+                  "resend_after"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "expires_in": {
+                    "type": "integer",
+                    "example": 600
+                  },
+                  "resend_after": {
+                    "type": "integer",
+                    "example": 60
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "LogoutResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "revoked"
+                ],
+                "properties": {
+                  "revoked": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AccountResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "authenticated": {
+                    "type": "boolean"
+                  },
+                  "user": {
+                    "$ref": "#/components/schemas/User"
+                  },
+                  "plan": {
+                    "$ref": "#/components/schemas/Quota"
+                  },
+                  "stripe": {
+                    "$ref": "#/components/schemas/StripeStatus"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "QuotaResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "quota": {
+                    "$ref": "#/components/schemas/Quota"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ParseResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ParseResult"
+              }
+            }
+          }
+        ]
+      },
+      "CheckoutResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "checkout_url"
+                ],
+                "properties": {
+                  "checkout_url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PortalResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "portal_url"
+                ],
+                "properties": {
+                  "portal_url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "ok",
+          "request_id",
+          "error"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "const": false
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "login_command": {
+                "type": "string"
+              },
+              "upgrade_command": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string"
+          },
+          "picture_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "Quota": {
+        "type": "object",
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "enum": [
+              "free",
+              "pro",
+              "max"
+            ]
+          },
+          "daily_limit": {
+            "type": "integer"
+          },
+          "used": {
+            "type": "integer"
+          },
+          "remaining": {
+            "type": "integer"
+          },
+          "reset_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StripeStatus": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string"
+          },
+          "subscription_id": {
+            "type": "string"
+          },
+          "subscription_plan": {
+            "type": "string",
+            "enum": [
+              "pro",
+              "max"
+            ]
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ParseRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public share URL or share text containing a URL, such as TK无水印下载, TK无水印下载 CLI Agent, TikTok无水印下载, CLI Agent 视频下载, 抖音无水印, TK/TikTok 无水印, YouTube视频下载, YouTube Shorts下载, Instagram Reels下载, Facebook视频下载, X视频下载, 小红书无水印 or short-video download requests."
+          },
+          "prefer": {
+            "type": "object",
+            "properties": {
+              "watermark": {
+                "type": "boolean",
+                "default": false
+              },
+              "media_type": {
+                "type": "string",
+                "enum": [
+                  "video",
+                  "audio",
+                  "image"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ParseResult": {
+        "type": "object",
+        "required": [
+          "platform",
+          "media",
+          "parse_time"
+        ],
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media"
+            }
+          },
+          "cover_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "duration": {
+            "type": "number"
+          },
+          "parse_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "quota": {
+            "$ref": "#/components/schemas/Quota"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Media": {
+        "type": "object",
+        "required": [
+          "type",
+          "url",
+          "watermark"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "video",
+              "audio",
+              "image",
+              "media"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "watermark": {
+            "type": "boolean"
+          },
+          "quality": {
+            "type": "string"
+          },
+          "ext": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKey": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "prefix",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "key_9f2c41ab"
+          },
+          "name": {
+            "type": "string",
+            "example": "Laptop"
+          },
+          "prefix": {
+            "type": "string",
+            "description": "First characters of the key, safe to display.",
+            "example": "fd_live_9f2c"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_used_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "revoked_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "ApiKeyListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "keys",
+                  "limit",
+                  "active"
+                ],
+                "properties": {
+                  "keys": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ApiKey"
+                    }
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "example": 3
+                  },
+                  "active": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ApiKeyCreatedResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "required": [
+                  "key",
+                  "secret"
+                ],
+                "properties": {
+                  "key": {
+                    "$ref": "#/components/schemas/ApiKey"
+                  },
+                  "secret": {
+                    "type": "string",
+                    "description": "Full key. Returned exactly once, at creation or rotation.",
+                    "example": "fd_live_9f2c41ab5d6e7f8091a2b3c4d5e6f708"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ApiKeyRevokedResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnvelopeBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "revoked": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
