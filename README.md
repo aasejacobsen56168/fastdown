@@ -80,7 +80,7 @@ Fastdown 把这条链路做成了一个接口：**你只负责贴链接，平台
 | 你的场景 | 用什么 | 怎么开始 |
 |---|---|---|
 | 偶尔下一条，手机/电脑都行 | **网页版** | 打开 <https://fastdown.pro>，粘贴链接，点 Parse |
-| 批量、脚本化、要落到指定目录 | **CLI** | `curl -fsSL https://fastdown.pro/cli \| sh -s -- --agent auto` |
+| 批量、脚本化、要落到指定目录 | **CLI** | `curl -fsSL https://fastdown.pro/cli \| sh` |
 | 接进自己的服务、CI、工作流 | **REST API** | `POST https://fastdown.pro/api/v1/parse`，Bearer 鉴权 |
 | 让 Codex / Claude Code / Cursor 自己会下载 | **MCP** | 一条带 key 的命令装好，Agent 里直接说「下载这个链接」 |
 
